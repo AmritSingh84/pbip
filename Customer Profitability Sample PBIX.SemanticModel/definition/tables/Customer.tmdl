@@ -1,0 +1,111 @@
+table Customer
+	lineageTag: 233f89a4-58b4-4739-b7dc-8ab15ab77a8c
+
+	column Customer
+		dataType: double
+		isHidden
+		lineageTag: 81e481e5-1f1d-407d-9171-b00cf6da56a6
+		summarizeBy: none
+		sourceColumn: Customer
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Country/Region
+		dataType: string
+		lineageTag: aae21c3e-f512-4c90-b560-03a6bdb2c505
+		summarizeBy: none
+		sourceColumn: Country/Region
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	column Name
+		dataType: string
+		lineageTag: f3249e2d-9bcb-4808-8e40-ad688b52fd10
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	column City
+		dataType: string
+		lineageTag: 6d262719-0311-41d8-98b2-cf2f6bb7b066
+		dataCategory: City
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	column 'Postal Code'
+		dataType: double
+		lineageTag: 80d8f82e-4e67-469a-83bd-6a2fac2ac94d
+		dataCategory: PostalCode
+		summarizeBy: count
+		sourceColumn: Postal Code
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column State
+		dataType: string
+		lineageTag: 01b2d09d-b678-430d-9a61-9109912c3a5a
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	column 'Industry ID'
+		dataType: double
+		isHidden
+		lineageTag: 07c5ce49-fef4-47e0-99ce-3eecff996590
+		summarizeBy: none
+		sourceColumn: Industry ID
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	hierarchy CustomerHierarchy
+		lineageTag: 1233d9a2-8ae0-4477-9046-900d46526f7b
+
+		level Country
+			lineageTag: ab0684f7-2395-4b00-b6c0-62cd01d6d10f
+			column: Country/Region
+
+		level State
+			lineageTag: 5e60fbf8-60a5-4a07-acd9-04ddaaae441a
+			column: State
+
+		level City
+			lineageTag: de38ef0f-c4c4-43d5-b3cd-2de22bd350be
+			column: City
+
+		level 'Postal Code'
+			lineageTag: 5a480751-35c8-4068-b691-533b6c577b87
+			column: 'Postal Code'
+
+		level Customer
+			lineageTag: 84a8a8e7-0b14-4bcc-b4e8-c1645687f3a2
+			column: Customer
+
+	partition Customer = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\mad\Dropbox\Work\Obvience\IP\Customer and Product Profitability\Data\dimCustomer.xlsx"), null, true),
+				    Sheet = Source{[Item="Sheet1",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(Sheet),
+				    #"Renamed Columns" = Table.RenameColumns(#"Promoted Headers", {{"Customer", "Customer"}, {"Country", "Country/Region"}, {"Name", "Name"}, {"City", "City"}, {"Postal Code", "Postal Code"}, {"State", "State"}, {"Industry ID", "Industry ID"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns", {{"Customer", type number}, {"Country/Region", type text}, {"Name", type text}, {"City", type text}, {"Postal Code", type number}, {"State", type text}, {"Industry ID", type number}})
+				 in
+				    #"Changed Type"
+

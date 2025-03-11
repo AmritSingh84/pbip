@@ -1,0 +1,64 @@
+table BU
+	lineageTag: c766b3be-3d2a-4ea8-9d02-4b6d46081da8
+
+	column 'BU Key'
+		dataType: double
+		isHidden
+		lineageTag: e174f5c4-9408-4577-ae89-3aef0c9493c3
+		summarizeBy: none
+		sourceColumn: BU Key
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column BU
+		dataType: string
+		lineageTag: 6c3688d0-38fb-439a-ab20-565cd1d7f977
+		summarizeBy: none
+		sourceColumn: BU
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	column Division
+		dataType: string
+		lineageTag: c5c41ee4-7d49-4347-82ea-4d13baaad33e
+		summarizeBy: none
+		sourceColumn: Division
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	column Executive_id
+		dataType: int64
+		isHidden
+		lineageTag: 88d152df-3d4f-4a98-8800-bff6b465dff0
+		summarizeBy: none
+		sourceColumn: Executive_id
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy BUHierarchy
+		lineageTag: 5ec333e4-d4a8-4b7f-a227-f55cfe39f45b
+
+		level Division
+			lineageTag: 8920f495-a889-44bc-8a99-49fda44a8a71
+			column: Division
+
+		level BU
+			lineageTag: d897d0a8-b2ce-459a-8bfc-49b8d1e002c5
+			column: BU
+
+	partition BU = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(".", "IP", [Query="SELECT #(lf)       #(lf)      [Profit Center Key] [BU Key],#(lf)   BU,#(lf)   Division, Executive_id#(lf)  FROM [MDS].[mdm].[profitcenter]"]),
+				    #"Renamed Columns" = Table.RenameColumns(Source, {{"BU Key", "BU Key"}, {"BU", "BU"}, {"Division", "Division"}, {"Executive_id", "Executive_id"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns", {{"BU Key", type number}, {"BU", type text}, {"Division", type text}, {"Executive_id", Int64.Type}})
+				in
+				    #"Changed Type"
+

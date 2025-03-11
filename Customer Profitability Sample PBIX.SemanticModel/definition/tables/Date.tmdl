@@ -1,0 +1,107 @@
+table Date
+	lineageTag: 4f3e6d9c-6fc5-47f4-b522-05526cffb850
+	dataCategory: Time
+
+	column YearPeriod
+		dataType: string
+		lineageTag: f8df9635-7769-4691-bfa4-85575b71cb8d
+		summarizeBy: none
+		sourceColumn: YearPeriod
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	column Year
+		dataType: int64
+		lineageTag: c38428f2-5b16-46dd-862e-bcfd81fa82b3
+		summarizeBy: sum
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Period
+		dataType: string
+		lineageTag: 189f85a9-9bf9-4186-b53a-3b49290ad378
+		summarizeBy: none
+		sourceColumn: Period
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: General Date
+		lineageTag: e55ca733-219a-45cd-92a2-5f6f28a43afc
+		summarizeBy: none
+		sourceColumn: Date
+
+		variation Variation
+			isDefault
+			relationship: db9c55a6-9978-4ac0-88b4-4f07ed8945a3
+			defaultHierarchy: LocalDateTable_39c22ddb-27f3-4e6c-8a44-a3380850fcb4.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: string
+		lineageTag: b3999d08-ba81-4374-bd0f-ea0f6ebdcfd6
+		summarizeBy: none
+		sourceColumn: Month
+		sortByColumn: Period
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	column QtrID
+		dataType: string
+		lineageTag: 2abd7475-4700-4f9f-83ab-11a11c5a5a6d
+		summarizeBy: none
+		sourceColumn: QtrID
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	column Qtr
+		dataType: string
+		lineageTag: 5db9b705-8f53-4dec-a459-b41b1b5bf427
+		summarizeBy: none
+		sourceColumn: Qtr
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	hierarchy YQM
+		lineageTag: 095348f9-bf3a-4de4-ba45-15abaf67a6f4
+
+		level Year
+			lineageTag: c8183c35-818e-4faf-9811-188090327c85
+			column: Year
+
+		level Qtr
+			lineageTag: 0e549acc-ae2a-47dc-9b76-d0f6c9cb71fb
+			column: Qtr
+
+		level Month
+			lineageTag: 8c53fd14-1353-4666-aba3-3e053117593c
+			column: Month
+
+	partition Date = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(".", "IP", [Query="SELECT#(lf)       concat([Year], [period]) YearPeriod#(lf)#(tab)  ,[Year]#(lf)      ,[Period]#(lf)      ,[Date]#(lf)      ,[Month]#(lf)      ,[QtrID]#(lf)      ,[Qtr]#(lf)  FROM [MDS].[mdm].[fiscalperiod]"]),
+				    #"Renamed Columns" = Table.RenameColumns(Source, {{"YearPeriod", "YearPeriod"}, {"Year", "Year"}, {"Period", "Period"}, {"Date", "Date"}, {"Month", "Month"}, {"QtrID", "QtrID"}, {"Qtr", "Qtr"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns", {{"YearPeriod", type text}, {"Year", Int64.Type}, {"Period", type text}, {"Date", type datetime}, {"Month", type text}, {"QtrID", type text}, {"Qtr", type text}})
+				in
+				    #"Changed Type"
+
+	annotation __PBI_LegacyCustomDateTable = true
+

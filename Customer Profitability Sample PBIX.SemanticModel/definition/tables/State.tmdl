@@ -1,0 +1,46 @@
+table State
+	lineageTag: aa4f766d-99f6-4bdc-b90c-0d6d36c9bfe4
+
+	column StateCode
+		dataType: string
+		lineageTag: b6a7e050-0946-44e9-ad69-42b26a78b6e8
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: StateCode
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	column State
+		dataType: string
+		lineageTag: 2334efad-10ce-4779-8522-7fe558b62bbc
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	column Region
+		dataType: string
+		lineageTag: de25b4f8-9b3d-4aca-89b5-407e7f17fdeb
+		dataCategory: Country
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	partition State = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(".", "IP", [Query="select StateShort StateCode, StateName State, Region from MDS.mdm.state"]),
+				    #"Renamed Columns" = Table.RenameColumns(Source, {{"StateCode", "StateCode"}, {"State", "State"}, {"Region", "Region"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns", {{"StateCode", type text}, {"State", type text}, {"Region", type text}})
+				in
+				    #"Changed Type"
+
