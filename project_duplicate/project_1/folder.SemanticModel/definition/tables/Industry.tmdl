@@ -1,0 +1,50 @@
+table Industry
+	lineageTag: abe08ef1-705d-4dec-a59e-d69a126f2b0a
+
+	column ID
+		dataType: int64
+		isHidden
+		isKey
+		keepUniqueRows
+		lineageTag: 9e7ae2c0-b22a-4601-b4b8-524607b5cdbc
+		summarizeBy: none
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Industry
+		dataType: string
+		keepUniqueRows
+		lineageTag: 53e796a0-26c2-4b0e-aac8-349146fcc15d
+		isDefaultLabel
+		summarizeBy: none
+		sourceColumn: Industry
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isText":true}
+
+	column Image
+		dataType: binary
+		lineageTag: d87d58aa-3577-4347-9b88-dd05691372b8
+		dataCategory: Image
+		isDefaultImage
+		summarizeBy: none
+		sourceColumn: Image
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Industry = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(".", "IP", [Query="SELECT [dbo].[Industry].*   FROM [dbo].[Industry]"]),
+				    #"Renamed Columns" = Table.RenameColumns(Source, {{"ID", "ID"}, {"Industry", "Industry"}, {"Image", "Image"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns", {{"ID", Int64.Type}, {"Industry", type text}, {"Image", type binary}})
+				in
+				    #"Changed Type"
+
